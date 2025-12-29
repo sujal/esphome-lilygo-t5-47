@@ -90,8 +90,10 @@ void LilygoT547Display::flush_screen_changes() {
 
   epd_poweron();
   err = epd_hl_update_screen(&hl, MODE_GC16, this->temperature_);
+  // E-paper needs time to settle after update before power off
+  // 700ms may not be enough for full pixel transition
   if (this->power_off_delay_enabled_ == true) {
-    delay(700);
+    delay(1500);
   }
   epd_poweroff();
 
