@@ -98,8 +98,8 @@ void LilygoT547Display::flush_screen_changes() {
   epd_poweron();
 
   // After a full clear, use optimized white-to-content mode for better contrast
-  // Otherwise use standard GC16 mode for grayscale transitions
-  enum EpdDrawMode mode = MODE_GC16;
+  // Otherwise use GL16 mode for non-flashing grayscale transitions (better for partial updates)
+  enum EpdDrawMode mode = MODE_GL16;
   if (this->just_cleared_) {
     ESP_LOGD(TAG, "Using MODE_EPDIY_WHITE_TO_GL16 after clear for better contrast");
     mode = MODE_EPDIY_WHITE_TO_GL16;
