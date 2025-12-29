@@ -1,11 +1,12 @@
 #pragma once
-#include <Arduino.h>
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/core/hal.h"
 
 // Note: Using legacy ADC driver to maintain compatibility with epdiy library
 // which also uses the legacy driver. Mixing new and legacy drivers causes conflicts.
+// DO NOT use Arduino's analogRead() - it uses the new ADC driver internally
+// and conflicts with the legacy driver used by epdiy.
 #include <driver/adc.h>
 #include "esp_adc_cal.h"
 
