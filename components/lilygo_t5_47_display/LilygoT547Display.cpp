@@ -1,5 +1,6 @@
 #include "LilygoT547Display.h"
 #include "esphome/core/log.h"
+#include "esp_task_wdt.h"
 
 namespace esphome {
 namespace lilygo_t5_47_display {
@@ -41,18 +42,32 @@ void LilygoT547Display::update() {
 }
 
 void LilygoT547Display::clear() {
+  ESP_LOGI(TAG, "Clearing display...");
+  // Disable watchdog for this task during long-running display operation
+  esp_task_wdt_delete(NULL);
+
   epd_poweron();
   epd_fullclear(&hl, this->temperature_);
   epd_poweroff();
+
+  // Re-enable watchdog
+  esp_task_wdt_add(NULL);
+  ESP_LOGI(TAG, "Display cleared");
 }
 
 void LilygoT547Display::flush_screen_changes() {
+  // Disable watchdog for this task during long-running display operation
+  esp_task_wdt_delete(NULL);
+
   epd_poweron();
   err = epd_hl_update_screen(&hl, MODE_GC16, this->temperature_);
   if (this->power_off_delay_enabled_ == true) {
     delay(700);
   }
   epd_poweroff();
+
+  // Re-enable watchdog
+  esp_task_wdt_add(NULL);
 }
 
 void LilygoT547Display::set_all_white() { epd_hl_set_all_white(&hl); }
