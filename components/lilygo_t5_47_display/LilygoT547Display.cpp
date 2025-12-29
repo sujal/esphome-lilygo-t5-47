@@ -16,6 +16,9 @@ void LilygoT547Display::set_power_off_delay_enabled(bool power_off_delay_enabled
 void LilygoT547Display::set_landscape(bool landscape) { this->landscape_ = landscape; }
 
 void LilygoT547Display::set_temperature(uint32_t temperature) { this->temperature_ = temperature; }
+void LilygoT547Display::set_full_clear_on_boot(bool full_clear_on_boot) {
+  this->full_clear_on_boot_ = full_clear_on_boot;
+}
 
 int LilygoT547Display::get_width_internal() { return 960; }
 
@@ -38,21 +41,37 @@ void LilygoT547Display::setup() {
 }
 
 void LilygoT547Display::update() {
-  ESP_LOGD(TAG, "update() called: init_clear_executed_=%s, clear_=%s",
+  ESP_LOGD(TAG, "update() called: init_clear_executed_=%s, clear_=%s, full_clear_on_boot_=%s",
            this->init_clear_executed_ ? "true" : "false",
-           this->clear_ ? "true" : "false");
+           this->clear_ ? "true" : "false",
+           this->full_clear_on_boot_ ? "true" : "false");
+
+  // Full clear on boot - uses epd_fullclear() which properly syncs framebuffers
+  // This should be done BEFORE the regular clear to establish a known baseline
+  if (this->full_clear_on_boot_executed_ == false && this->full_clear_on_boot_ == true) {
+    ESP_LOGI(TAG, "Performing full clear on boot (syncs framebuffers with display)");
+    // Disable watchdog for this task during long-running display operation
+    esp_task_wdt_delete(NULL);
+    epd_poweron();
+    epd_fullclear(&hl, this->temperature_);
+    epd_poweroff();
+    esp_task_wdt_add(NULL);
+    this->full_clear_on_boot_executed_ = true;
+    ESP_LOGI(TAG, "Full clear on boot completed");
+  }
 
   if (this->init_clear_executed_ == false && this->clear_ == true) {
     ESP_LOGI(TAG, "Triggering initial clear from update()");
-    LilygoT547Display::clear();
+    LilygoT547Display::full_clear();
     this->init_clear_executed_ = true;
   }
+
   this->do_update_();
   LilygoT547Display::flush_screen_changes();
 }
 
-void LilygoT547Display::clear() {
-  ESP_LOGI(TAG, "Clearing display...");
+void LilygoT547Display::full_clear() {
+  ESP_LOGI(TAG, "Full hardware clear (e-paper flash)...");
   // Disable watchdog for this task during long-running display operation
   esp_task_wdt_delete(NULL);
 
@@ -62,7 +81,7 @@ void LilygoT547Display::clear() {
 
   // Re-enable watchdog
   esp_task_wdt_add(NULL);
-  ESP_LOGI(TAG, "Display cleared");
+  ESP_LOGI(TAG, "Full hardware clear completed");
 }
 
 void LilygoT547Display::flush_screen_changes() {

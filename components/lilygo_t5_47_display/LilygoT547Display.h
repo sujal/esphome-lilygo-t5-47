@@ -27,6 +27,7 @@ class LilygoT547Display : public display::DisplayBuffer {
   void set_landscape(bool landscape);
   void set_power_off_delay_enabled(bool power_off_delay_enabled);
   void set_temperature(uint32_t temperature);
+  void set_full_clear_on_boot(bool full_clear_on_boot);
 
   int get_width_internal();
 
@@ -36,7 +37,7 @@ class LilygoT547Display : public display::DisplayBuffer {
 
   void update() override;
 
-  void clear();
+  void full_clear();
   void flush_screen_changes();
   void set_all_white();
   void poweron();
@@ -50,7 +51,9 @@ class LilygoT547Display : public display::DisplayBuffer {
 
   bool clear_;
   bool init_clear_executed_ = false;
-  bool temperature_;
+  bool full_clear_on_boot_;
+  bool full_clear_on_boot_executed_ = false;
+  uint32_t temperature_;
   bool power_off_delay_enabled_;
   bool landscape_;
 };
