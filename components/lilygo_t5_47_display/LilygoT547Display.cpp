@@ -22,6 +22,11 @@ int LilygoT547Display::get_width_internal() { return 960; }
 int LilygoT547Display::get_height_internal() { return 540; }
 
 void LilygoT547Display::setup() {
+  ESP_LOGI(TAG, "Setup: clear_=%s, landscape_=%s, temperature_=%d",
+           this->clear_ ? "true" : "false",
+           this->landscape_ ? "true" : "false",
+           this->temperature_);
+
   epd_init(&epd_board_lilygo_t5_47, &ED047TC1, EPD_OPTIONS_DEFAULT);
   hl = epd_hl_init(EPD_BUILTIN_WAVEFORM);
   if (landscape_) {
@@ -33,7 +38,12 @@ void LilygoT547Display::setup() {
 }
 
 void LilygoT547Display::update() {
+  ESP_LOGD(TAG, "update() called: init_clear_executed_=%s, clear_=%s",
+           this->init_clear_executed_ ? "true" : "false",
+           this->clear_ ? "true" : "false");
+
   if (this->init_clear_executed_ == false && this->clear_ == true) {
+    ESP_LOGI(TAG, "Triggering initial clear from update()");
     LilygoT547Display::clear();
     this->init_clear_executed_ = true;
   }
