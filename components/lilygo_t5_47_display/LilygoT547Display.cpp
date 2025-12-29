@@ -1,8 +1,6 @@
 #include "LilygoT547Display.h"
 #include "esphome/core/log.h"
 
-#define WAVEFORM EPD_BUILTIN_WAVEFORM
-
 namespace esphome {
 namespace lilygo_t5_47_display {
 
@@ -23,14 +21,12 @@ int LilygoT547Display::get_width_internal() { return 960; }
 int LilygoT547Display::get_height_internal() { return 540; }
 
 void LilygoT547Display::setup() {
-  epd_init(EPD_OPTIONS_DEFAULT);
-  hl = epd_hl_init(WAVEFORM);
+  epd_init(&epd_board_lilygo_t5_47, &ED047TC1, EPD_OPTIONS_DEFAULT);
+  hl = epd_hl_init(EPD_BUILTIN_WAVEFORM);
   if (landscape_) {
-    EpdRotation orientation = EPD_ROT_LANDSCAPE;
-    epd_set_rotation(orientation);
+    epd_set_rotation(EPD_ROT_LANDSCAPE);
   } else {
-    EpdRotation orientation = EPD_ROT_PORTRAIT;
-    epd_set_rotation(orientation);
+    epd_set_rotation(EPD_ROT_PORTRAIT);
   }
   fb = epd_hl_get_framebuffer(&hl);
 }
