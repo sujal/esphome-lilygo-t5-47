@@ -54,9 +54,11 @@ void LilygoT547Display::update() {
     esp_task_wdt_delete(NULL);
     epd_poweron();
     epd_fullclear(&hl, this->temperature_);
+    delay(500);  // Allow display to settle
     epd_poweroff();
     esp_task_wdt_add(NULL);
     this->full_clear_on_boot_executed_ = true;
+    this->just_cleared_ = true;  // Use optimized mode for next update
     ESP_LOGI(TAG, "Full clear on boot completed");
   }
 
@@ -77,7 +79,12 @@ void LilygoT547Display::full_clear() {
 
   epd_poweron();
   epd_fullclear(&hl, this->temperature_);
+  // Allow display to settle after clear
+  delay(500);
   epd_poweroff();
+
+  // Mark that we just cleared - next update can use optimized white-to-content mode
+  this->just_cleared_ = true;
 
   // Re-enable watchdog
   esp_task_wdt_add(NULL);
@@ -89,7 +96,18 @@ void LilygoT547Display::flush_screen_changes() {
   esp_task_wdt_delete(NULL);
 
   epd_poweron();
-  err = epd_hl_update_screen(&hl, MODE_GC16, this->temperature_);
+
+  // After a full clear, use optimized white-to-content mode for better contrast
+  // Otherwise use standard GC16 mode for grayscale transitions
+  enum EpdDrawMode mode = MODE_GC16;
+  if (this->just_cleared_) {
+    ESP_LOGD(TAG, "Using MODE_EPDIY_WHITE_TO_GL16 after clear for better contrast");
+    mode = MODE_EPDIY_WHITE_TO_GL16;
+    this->just_cleared_ = false;
+  }
+
+  err = epd_hl_update_screen(&hl, mode, this->temperature_);
+
   // E-paper needs time to settle after update before power off
   if (this->power_off_delay_enabled_ == true) {
     delay(500);

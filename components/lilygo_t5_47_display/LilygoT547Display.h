@@ -53,6 +53,7 @@ class LilygoT547Display : public display::DisplayBuffer {
   bool init_clear_executed_ = false;
   bool full_clear_on_boot_;
   bool full_clear_on_boot_executed_ = false;
+  bool just_cleared_ = false;
   uint32_t temperature_;
   bool power_off_delay_enabled_;
   bool landscape_;
