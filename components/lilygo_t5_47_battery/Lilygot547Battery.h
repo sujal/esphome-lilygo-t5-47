@@ -1,11 +1,13 @@
 #pragma once
+#include <Arduino.h>
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/core/hal.h"
 
-#include "esp_adc/adc_oneshot.h"
-#include "esp_adc/adc_cali.h"
-#include "esp_adc/adc_cali_scheme.h"
+// Note: Using legacy ADC driver to maintain compatibility with epdiy library
+// which also uses the legacy driver. Mixing new and legacy drivers causes conflicts.
+#include <driver/adc.h>
+#include "esp_adc_cal.h"
 
 #include "epdiy.h"
 
@@ -22,9 +24,9 @@ class Lilygot547Battery : public PollingComponent {
   void set_voltage_sensor(sensor::Sensor *voltage_sensor) { voltage = voltage_sensor; }
 
  protected:
-  adc_oneshot_unit_handle_t adc_handle_{nullptr};
-  adc_cali_handle_t cali_handle_{nullptr};
-  bool calibration_enabled_{false};
+  int vref_{1100};
+  void update_battery_voltage_();
+  void calibrate_adc_();
 };
 }  // namespace lilygo_t5_47_battery
 }  // namespace esphome
