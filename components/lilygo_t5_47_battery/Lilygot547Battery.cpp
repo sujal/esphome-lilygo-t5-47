@@ -6,8 +6,8 @@ namespace lilygo_t5_47_battery {
 
 static const char *const TAG = "lilygo_t5_47_battery";
 
-// GPIO36 is ADC1_CHANNEL_0 on ESP32
-static const adc_channel_t BATTERY_ADC_CHANNEL = ADC1_CHANNEL_0;
+// GPIO36 is ADC_CHANNEL_0 on ADC_UNIT_1 for ESP32
+static const adc_channel_t BATTERY_ADC_CHANNEL = ADC_CHANNEL_0;
 static const adc_atten_t BATTERY_ADC_ATTEN = ADC_ATTEN_DB_12;
 
 void Lilygot547Battery::setup() {
