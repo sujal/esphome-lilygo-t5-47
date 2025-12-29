@@ -42,7 +42,7 @@ external_components:
 display:
   - platform: lilygo_t5_47_display
     id: t5_display
-    clear_screen: true
+    clear: true
     temperature: 25
     landscape: true
     power_off_delay_enabled: false
@@ -54,7 +54,7 @@ display:
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `clear_screen` | boolean | `true` | Clear screen on first update |
+| `clear` | boolean | `true` | Clear screen on first update |
 | `temperature` | int | `25` | Ambient temperature (°C) for waveform timing |
 | `landscape` | boolean | `true` | `true` = 960x540, `false` = 540x960 |
 | `power_off_delay_enabled` | boolean | `false` | Add 700ms delay before power off |
@@ -93,7 +93,7 @@ font:
 display:
   - platform: lilygo_t5_47_display
     id: t5_display
-    clear_screen: true
+    clear: true
     temperature: 25
     landscape: true
     lambda: |-
